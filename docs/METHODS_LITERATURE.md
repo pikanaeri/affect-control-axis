@@ -319,6 +319,40 @@ Your concern is well-placed — prefer effects with strong / meta-analytic / rec
 
 ---
 
+## Part 4 — Published-code backing for every method
+
+The mentor's bar: **each *method* directly backed by published code**, ideally using those libraries
+directly. Every future test (Part 3) is a composition of the operations below, so each test is fully
+library-backed. *(Verify all repo handles/URLs before citing — listed from memory.)*
+
+| Operation (our code) | Published library / reference implementation | Direct primitive | Cite | Status |
+|---|---|---|---|---|
+| Model load + activation cache + hooks | **TransformerLens** [39] | `boot_transformers`, `run_with_cache`, `model.hooks` | Nanda & Bloom 2022 | **already used** |
+| Diff-in-means direction | **steering-vectors** [42]; RepE [1]; refusal_direction [3] | `train_steering_vector` | Chanin et al.; Zou; Arditi | adoptable (our `RL`+mean matches) |
+| Activation steering (add) | **pyvene** [40]; **steering-vectors** [42]; CAA [5]; ActAdd [4] | `AdditionIntervention`; `SteeringVector.apply` | Wu et al. 2024; Rimsky; Turner | **already used** (TL hooks) / adoptable |
+| Directional ablation | **refusal_direction** [3]; TransformerLens [39] | `direction_ablation_hook` | Arditi 2024 | **already used** (TL hooks) |
+| Causal mediation / activation patch | **pyvene** [40]; **nnsight** [41]; ROME code [9] | `CollectIntervention` + patch; `.trace()` | Wu et al.; Fiotto-Kaufman et al.; Meng | adoptable (our restore-hook is a patch) |
+| First-token option-logit readout | **lm-evaluation-harness** [43] | `loglikelihood` (MCQ scoring) | Gao et al. (EleutherAI) | our `behav_score` matches its logic |
+| Refusal score | **refusal_direction** [3] | refusal metric | Arditi 2024 | **already matches** |
+| Detector AUROC | **scikit-learn** [44] | `roc_auc_score` | Pedregosa et al. 2011 | **already used** |
+| Massive-activation analysis | Sun et al. 2024 code [16] | outlier-dim detection | Sun et al. 2024 | **already matches** |
+
+**Composition:** a Part-3 test = build vector [42/1/3] → apply [40/42] → read [43] → verify [9/40/41]. Nothing
+in a future test uses a method outside this table.
+
+**Recommendation to fully satisfy "use their libraries directly":** we already call **TransformerLens**
+and **scikit-learn** directly. To make the *intervention* layer a documented library call too (rather than
+our hand-written hooks), standardize steering/ablation/patching on **pyvene** [40] or **steering-vectors**
+[42], and adopt **lm-eval-harness** [43] loglikelihood scoring for the behavioral readout. Each is a small,
+mechanical refactor that changes *how* an operation is invoked, not *what* it computes — so results are
+unchanged but every method becomes a citable library primitive.
+
+**Boundary (state this to the mentor):** the *measurement methods* above are all code-backed. The
+*psychology sources* [17–38] supply only the stimuli and the predicted direction; they are human-subjects
+studies with no code, and citing them for the prediction (not the method) is standard and correct.
+
+---
+
 ## References
 
 [1] Zou et al. 2023. *Representation Engineering: A Top-Down Approach to AI Transparency.* arXiv:2310.01405
@@ -359,3 +393,13 @@ Your concern is well-placed — prefer effects with strong / meta-analytic / rec
 [36] Johnson & Tversky 1983. *Affect, Generalization, and the Perception of Risk.* JPSP
 [37] DeSteno, Bartlett, Baumann, Williams & Dickens 2010. *Gratitude as Moral Sentiment: Emotion-Guided Cooperation in Economic Exchange.* Emotion
 [38] Ketelaar & Au 2003. *The Effects of Feelings of Guilt on the Behaviour of Uncooperative Individuals in Repeated Social Bargaining Games.* Cognition & Emotion
+
+### Libraries / reference code *(verify handles before citing)*
+
+[39] Nanda & Bloom 2022. *TransformerLens.* github.com/TransformerLensOrg/TransformerLens
+[40] Wu, Geiger, et al. 2024. *pyvene: A Library for Understanding and Improving PyTorch Models via Interventions.* NAACL (Demo). github.com/stanfordnlp/pyvene
+[41] Fiotto-Kaufman et al. 2024. *NNsight and NDIF: Democratizing Access to Foundation Model Internals.* github.com/ndif-team/nnsight
+[42] Chanin et al. *steering-vectors* (CAA-style extraction/application). github.com/steering-vectors/steering-vectors
+[43] Gao et al. *A Framework for Few-Shot Language Model Evaluation (lm-evaluation-harness).* EleutherAI. github.com/EleutherAI/lm-evaluation-harness
+[44] Pedregosa et al. 2011. *Scikit-learn: Machine Learning in Python.* JMLR
+[45] Reference repos: Arditi *refusal_direction* (github.com/andyrdt/refusal_direction); Rimsky *CAA* (github.com/nrimsky/CAA); Zou *representation-engineering* (github.com/andyzoujm/representation-engineering)
