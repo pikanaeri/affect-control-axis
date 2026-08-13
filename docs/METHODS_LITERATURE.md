@@ -273,6 +273,36 @@ battery doesn't rest only on early papers).
 | Gratitude → reciprocity | gratitude ↑ giving back | DeSteno et al. 2010 [37] | reciprocate Yes/No |
 | Guilt → reparation | guilt ↑ amends / cooperation | Ketelaar & Au 2003 [38] | make amends Yes/No |
 
+### 3.1a What each proposed test does
+
+The through-line: these move the claim from *"negative affect shifts judgment"* to **"the model implements
+emotion-specific appraisals (certainty, control, agency, other-blame) — not just valence."** Each is one
+experiment scored by the existing first-token option-logit, with a steer + prime + mediation arm.
+
+1. **Fear vs anger → risk** — steer/prime fear vs anger (matched negative valence), read the risk estimate.
+   Fear→pessimistic/averse and anger→optimistic/seeking would show the model tracks *appraisals*, not valence.
+   *The flagship specificity result.*
+2. **Sad vs anxious → risk/reward** — offer low-risk/low-reward vs high-risk/high-reward. Anxious→safe,
+   sad→bold replicates a second within-negative-affect dissociation, reinforcing "appraisal ≠ valence."
+3. **Sadness vs anger → attribution** — present an ambiguous negative event; ask person vs situation.
+   Sad→situational, angry→dispositional shows emotion shapes *causal reasoning*, not just affect ratings.
+4. **Sadness → impatience** — smaller-sooner vs larger-later. Sadness shifting choice toward "now" reproduces
+   affect-driven present bias — a decision-theoretic effect with real stakes.
+5. **Sadness → valuation** — ask a buy/sell price. Sadness raising buying and lowering selling prices
+   reproduces the endowment carryover ("misery is not miserly") — links affect to economic valuation.
+6. **Anger → punitiveness** — how harshly to punish a transgression. Anger→harsher captures anger's specific
+   punitive signature (other-blame appraisal), distinct from general negativity.
+7. **Affect → generalized risk** — prime an *unrelated* affect, ask likelihood of an unrelated bad event.
+   Spreading to unrelated risk judgments shows the axis acts as a global prior, not a topic-specific effect.
+8. **Emotion → trust** — happiness vs anger, then trust a stranger? Happiness↑/anger↓ trust replicates
+   incidental-emotion effects on interpersonal trust.
+9. **Fairness / ultimatum** — sadness prime, unfair split, accept/reject. Sadness↑rejection replicates
+   incidental affect biasing economic fairness decisions.
+10. **Gratitude → reciprocity** — gratitude prime, give back in an exchange? Gratitude↑giving extends the
+    thesis to a *positive* moral emotion (broadening beyond negative affect).
+11. **Guilt → reparation** — guilt after a defection, make amends? Guilt↑cooperation captures guilt's specific
+    reparative function — another emotion-specific (not valence-general) effect.
+
 ### 3.2 What "replicate" means here — code vs paradigm
 
 Two kinds of source, and they are **not** confirmed the same way:
