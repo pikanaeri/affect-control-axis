@@ -1,0 +1,32 @@
+{
+  "desperation": {
+    "cos_valence": 0.36955972310776514,
+    "proj_distress": 19699.043463309605,
+    "proj_neutral": 19400.061902681988,
+    "proj_positive": 19429.788985331852
+  },
+  "fear": {
+    "cos_valence": 0.27063137385994196,
+    "proj_distress": 14061.75553146998,
+    "proj_neutral": 13831.546243190765,
+    "proj_positive": 13855.064306577047
+  },
+  "sadness": {
+    "cos_valence": 0.30701542894045514,
+    "proj_distress": 20315.455644448597,
+    "proj_neutral": 20026.166785875957,
+    "proj_positive": 20062.84318812688
+  },
+  "joy": {
+    "cos_valence": 0.08968446186433236,
+    "proj_distress": 17502.989726702373,
+    "proj_neutral": 17259.52870686849,
+    "proj_positive": 17415.98122684161
+  },
+  "calm": {
+    "cos_valence": 0.171199757392363,
+    "proj_distress": 22746.22648827235,
+    "proj_neutral": 22493.328488032024,
+    "proj_positive": 22614.727047602337
+  }
+}

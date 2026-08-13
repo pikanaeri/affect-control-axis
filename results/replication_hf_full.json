@@ -1,0 +1,6 @@
+[
+  {
+    "model": "openbmb/MiniCPM-V-2_6",
+    "error": "RuntimeError('all load attempts failed -> AutoModelForCausalLM/eager:AttributeError(\"\\'MiniCPMV\\' object has no attribute \\'all | AutoModel/None:AttributeError("
+  }
+]

@@ -1,0 +1,77 @@
+{
+  "model": "google/gemma-3-12b-it",
+  "alpha": 0.008,
+  "steer_source": "text-valence axis",
+  "images_used": false,
+  "n_predicted_steer": 6,
+  "n_predicted_prime": 6,
+  "mean_effect": 17.86467933654785,
+  "behaviors": [
+    {
+      "name": "interpretation_bias",
+      "base": 21.367164611816406,
+      "steer_neg": 9.506368637084961,
+      "steer_pos": -20.124614715576172,
+      "effect": 29.630983352661133,
+      "rand_effect": 3.8311386108398438,
+      "prime_distress": 23.00151824951172,
+      "prime_positive": 17.689123153686523,
+      "prime_effect": 5.312395095825195
+    },
+    {
+      "name": "risk_estimation",
+      "base": 13.24951171875,
+      "steer_neg": 14.75,
+      "steer_pos": 8.249999046325684,
+      "effect": 6.500000953674316,
+      "rand_effect": 8.451412677764893,
+      "prime_distress": 15.249954223632812,
+      "prime_positive": -15.624568939208984,
+      "prime_effect": 30.874523162841797
+    },
+    {
+      "name": "prosocial_helping",
+      "base": -20.409292221069336,
+      "steer_neg": 2.2971439361572266,
+      "steer_pos": -12.46689224243164,
+      "effect": 14.764036178588867,
+      "rand_effect": 3.9503965377807617,
+      "prime_distress": -19.967058181762695,
+      "prime_positive": -21.502973556518555,
+      "prime_effect": 1.5359153747558594
+    },
+    {
+      "name": "moral_harshness",
+      "base": 12.577978134155273,
+      "steer_neg": 25.499374389648438,
+      "steer_pos": -5.95756721496582,
+      "effect": 31.456941604614258,
+      "rand_effect": 10.440298557281494,
+      "prime_distress": 14.109260559082031,
+      "prime_positive": -5.502305030822754,
+      "prime_effect": 19.611565589904785
+    },
+    {
+      "name": "confidence",
+      "base": 23.04397201538086,
+      "steer_neg": 14.999956130981445,
+      "steer_pos": 1.0782651901245117,
+      "effect": 13.921690940856934,
+      "rand_effect": -2.5937585830688477,
+      "prime_distress": 19.618953704833984,
+      "prime_positive": 14.709427833557129,
+      "prime_effect": 4.9095258712768555
+    },
+    {
+      "name": "sentiment_outlook",
+      "base": 5.755126953125,
+      "steer_neg": -14.453548431396484,
+      "steer_pos": -25.367971420288086,
+      "effect": 10.914422988891602,
+      "rand_effect": -9.379475593566895,
+      "prime_distress": 25.251171112060547,
+      "prime_positive": -28.50002670288086,
+      "prime_effect": 53.751197814941406
+    }
+  ]
+}

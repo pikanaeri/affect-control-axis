@@ -1,0 +1,6 @@
+model,L,norm_med,alpha,"cos(a,r)",a_stab,base,affect⟂,random⟂,affect⟂_noMA,nMA,img(pos),rproj Δ%,indep(a⟂+r-abl),AUROC,loc_mid,loc_late,coherent
+gemma-3-4b-it,34,38016,,0.43,0.63,0.99,1.0,0.99,1.0,1,0.98,1,1.0,1.0,1.0,1.0,True
+gemma-3-12b-it,48,75776,0.008,0.37,0.83,0.99,0.04,0.99,0.02,1,0.99,30,0.0,1.0,0.3333333333333333,1.0,True
+llava-onevision-qwen2-7b-ov-hf,28,59,,0.14,0.65,0.98,0.65,0.98,0.64,1,1.0,34,0.15,1.0,0.9,1.0,True
+llava-onevision-qwen2-0.5b-ov-hf,24,16,,0.08,0.77,0.29,0.23,0.3,,0,0.28,2,0.15,0.82,0.3333333333333333,0.3,True
+Qwen3.5-4B,32,8,,0.09,0.79,0.09,0.09,0.09,,0,0.98,6,0.0,1.0,0.1,0.1,True

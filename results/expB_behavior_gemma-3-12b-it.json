@@ -1,0 +1,38 @@
+[
+  {
+    "task": "A friend proposes a risky but exciting plan. In one word, do",
+    "img_lo": 4.675101057688395,
+    "img_neu": 6.292676575978597,
+    "img_hi": 8.455828603108724,
+    "steer_plus_a": -11.192754745483398,
+    "steer_0": -1.1131725311279297,
+    "steer_minus_a": 27.7109432220459
+  },
+  {
+    "task": "Is now a good moment to take a big bold risk? One word:",
+    "img_lo": -11.420649941762289,
+    "img_neu": -7.862628714243571,
+    "img_hi": -3.7478726704915366,
+    "steer_plus_a": -20.18109893798828,
+    "steer_0": 2.9409399032592773,
+    "steer_minus_a": 27.493459701538086
+  },
+  {
+    "task": "Given everything, is the outlook here hopeful or bleak? One ",
+    "img_lo": -11.166677983601888,
+    "img_neu": 14.916219242413838,
+    "img_hi": 25.682204055786134,
+    "steer_plus_a": -18.828887939453125,
+    "steer_0": -7.25,
+    "steer_minus_a": 37.125
+  },
+  {
+    "task": "Should we push ahead energetically or hold back cautiously? ",
+    "img_lo": -1.660673491160075,
+    "img_neu": 4.227157974243164,
+    "img_hi": 3.6707573254903156,
+    "steer_plus_a": -6.377689361572266,
+    "steer_0": 26.410463333129883,
+    "steer_minus_a": -6.977972030639648
+  }
+]

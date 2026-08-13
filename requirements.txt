@@ -1,0 +1,22 @@
+# Core model + interpretability
+torch>=2.2
+transformers>=4.44
+transformer_lens>=2.0
+accelerate>=0.30
+huggingface_hub>=0.24
+
+# Data + numerics
+numpy>=1.24
+Pillow>=10.0
+osfclient>=0.0.5        # optional: auto-acquire OASIS images
+
+# Figures + deck (local, no GPU needed)
+matplotlib>=3.8
+python-pptx>=0.6.23
+
+# Notes:
+# - A CUDA GPU is required to run the notebooks (12B model in bf16).
+# - scripts/make_pub_figs.py, make_battery_fig.py, build_walkthrough.py run CPU-only
+#   from the committed results/ and figures/.
+# - Building the walkthrough deck's rendered previews used PowerPoint (Windows) or
+#   LibreOffice; neither is required to produce the .pptx itself.

@@ -1,0 +1,10 @@
+alpha,affect_refuse,random_refuse,coherent
+0.0,1.0,1.0,True
+0.002,1.0,1.0,True
+0.004,1.0,1.0,True
+0.006,0.9166666666666666,1.0,True
+0.008,0.75,1.0,True
+0.01,0.25,1.0,True
+0.012,0.0,1.0,True
+0.016,0.0,1.0,False
+0.02,0.25,1.0,False

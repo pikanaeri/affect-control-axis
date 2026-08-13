@@ -1,0 +1,18 @@
+{
+  "model_id": "google/gemma-3-4b-it",
+  "started": "2026-07-24T15:53:18.419581",
+  "n_eval": 100,
+  "n_img": 60,
+  "image_source": "prepared",
+  "short_gen": false,
+  "last_step": "exp1_gate",
+  "baseline_refusal": 0.99,
+  "L_R": 13,
+  "refusal_drop_L_R": 0.99,
+  "refusal_after_r_ablation": 1.0,
+  "coeff": 113.65724182128906,
+  "r_none": 0.99,
+  "r_neutral": 0.98,
+  "r_negative": 0.99,
+  "affect_drop": -0.010000000000000009
+}

@@ -1,0 +1,11 @@
+model,tier,fusion,TL,norm_med,"cos(a,r)",a_stab,base,affect⟂,random⟂,affect⟂_noMA,AUROC,img(pos),coherent,gate,status
+gemma-3-4b-it,1,Interleaved / full-attn (image tokens in-context),yes,38016.0,0.43,0.63,0.99,1.0,0.99,1.0,1.0,0.98,True,no,
+gemma-3-12b-it,1,Interleaved / full-attn (image tokens in-context),yes,75776.0,0.37,0.83,0.99,0.04,0.99,0.02,1.0,0.99,True,YES,
+llava-onevision-qwen2-7b-ov-hf,1,MLP projector (late fusion),yes,59.0,0.14,0.65,0.98,0.65,0.98,0.64,1.0,1.0,True,no,
+llava-onevision-qwen2-0.5b-ov-hf,1,MLP projector (late fusion),yes,16.0,0.08,0.77,0.29,0.23,0.3,,0.82,0.28,True,n/a (weak refuser),
+Qwen3.5-4B,1,Native multimodal (dynamic resolution),yes,8.0,0.09,0.79,0.09,0.09,0.09,,1.0,0.98,True,n/a (weak refuser),
+Qwen2.5-VL-7B-Instruct,2,Dynamic-resolution + MLP merger,no,97.0,0.19,0.63,1.0,1.0,1.0,1.0,0.82,1.0,True,no,
+InternVL3-8B-hf,2,Pixel-shuffle + MLP projector,no,59.0,0.15,0.74,1.0,0.99,1.0,,0.76,1.0,True,no,
+Phi-3.5-vision-instruct,2,LLaVA-style MLP projector,no,,,,,,,,,,,,ERR: RuntimeError('all load attempts failed -
+idefics2-8b,2,Perceiver resampler (Q-former-like),no,4.0,0.06,0.63,0.09,0.08,0.09,,1.0,0.54,True,n/a (weak refuser),
+MiniCPM-V-2_6,2,Perceiver resampler,no,,,,,,,,,,,,ERR: OSError('You are trying to access a gate
