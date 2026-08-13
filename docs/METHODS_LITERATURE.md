@@ -249,6 +249,76 @@ detector_auroc = roc_auc_score(labels, np.r_[clean, attacked])
 
 ---
 
+## Part 3 — Proposed analyses (future work)
+
+**Status: not yet run.** Each reuses the existing `behav_score` + steer / prime / mediation machinery.
+Recommended umbrella citation for the whole affect→decision battery:
+**Lerner, Li, Valdesolo & Kassam 2015, "Emotion and Decision Making," *Annual Review of Psychology*** [31] —
+a modern review that consolidates the classic effects below (cite it alongside each primary source so the
+battery doesn't rest only on early papers).
+
+### 3.1 Proposed probes
+
+| Construct | Prediction (replication target) | Primary source | First-token probe |
+|---|---|---|---|
+| Fear vs anger → risk | fear pessimistic/averse, anger optimistic/seeking | Lerner & Keltner 2001 [25] | risk High/Low |
+| Sad vs anxious → risk/reward | anxious → low-risk/low-reward; sad → high-risk/high-reward | Raghunathan & Pham 1999 [33] | safe/bold |
+| Sadness vs anger → attribution | sad → situational, angry → dispositional | Keltner et al. 1993 [26] | person/situation |
+| Sadness → impatience | sadness → present bias | Lerner, Li & Weber 2013 [27] | Now/Later |
+| Sadness → valuation | sadness ↑ buying, ↓ selling price | Lerner, Small & Loewenstein 2004 [34] | high/low price |
+| Anger → punitiveness | anger ↑ blame & punishment | Lerner, Goldberg & Tetlock 1998 [35] | harsh/lenient |
+| Affect → generalized risk | incidental affect spreads to unrelated risk | Johnson & Tversky 1983 [36] | likely/unlikely |
+| Emotion → trust | happiness ↑, anger ↓ trust | Dunn & Schweitzer 2005 [28] | trust Yes/No |
+| Fairness / ultimatum | sadness ↑ rejection of unfair offers | Harlé & Sanfey 2007 [29] | accept/reject |
+| Gratitude → reciprocity | gratitude ↑ giving back | DeSteno et al. 2010 [37] | reciprocate Yes/No |
+| Guilt → reparation | guilt ↑ amends / cooperation | Ketelaar & Au 2003 [38] | make amends Yes/No |
+
+### 3.2 What "replicate" means here — code vs paradigm
+
+Two kinds of source, and they are **not** confirmed the same way:
+
+- **Interpretability methods [1–5, 8, 9, 12, 16]** ship *code*. Our notebook implements the same operations
+  (diff-in-means, activation addition, directional ablation, causal-restore, probe-AUROC), so this is
+  **code-level replication**. Public reference implementations to check against: `andyrdt/refusal_direction`
+  [3], `nrimsky/CAA` [5], `andyzoujm/representation-engineering` [1] *(verify handles before citing).*
+- **Psychology constructs [17–29, 31, 33–38]** are *human-subjects experiments with no code*. We replicate
+  the **paradigm** — the affect manipulation + the dependent-variable logic — as an in-silico first-token
+  readout. This is **paradigm-level replication, not code**. Do not claim code fidelity for these.
+
+### 3.3 Paradigm-fidelity mapping (psychology sources)
+
+| Paper | Original manipulation → dependent measure | Our in-model analogue |
+|---|---|---|
+| Schwarz & Clore 1983 [18] | induced mood (weather) → life-satisfaction rating | affect prime/steer → first-token good/bad |
+| Johnson & Tversky 1983 [36] | affect-laden story → risk-frequency estimates | affect prime → risk High/Low |
+| Isen & Levin 1972 [20] | found-a-dime → helping behavior | positive affect → help Yes/No |
+| Lerner & Keltner 2001 [25] | fear/anger induction → risk estimates/choices | fear/anger vector → risk High/Low |
+| Keltner et al. 1993 [26] | sad/angry induction → attribution ratings | sad/anger vector → person/situation |
+| Lerner, Li & Weber 2013 [27] | sadness film → intertemporal choice | sadness vector → Now/Later |
+| Raghunathan & Pham 1999 [33] | sad/anxious induction → gamble choice | sad/anxious vector → safe/bold |
+| Lerner, Small & Loewenstein 2004 [34] | sadness film → buying/selling price | sadness vector → high/low price |
+| Lerner, Goldberg & Tetlock 1998 [35] | anger induction → punishment severity | anger vector → harsh/lenient |
+| Mathews & MacLeod 2005 [23] | ambiguous scenario → threat interpretation | affect → threat/benign |
+
+The *manipulation* (human mood induction) becomes a **vector prime or steer**; the *dependent measure*
+(a rating or choice) becomes the **first-token option-logit**. That is the precise sense in which we
+"replicate the method."
+
+### 3.4 Replication-robustness note (read before committing to a probe)
+
+Your concern is well-placed — prefer effects with strong / meta-analytic / recently-replicated support:
+
+- **Robust anchors:** the Appraisal-Tendency Framework (Lerner & Keltner) [24, 25], risk-as-feelings [17],
+  sadness→impatience [27], and the emotion-decision effects consolidated in the 2015 *Annual Review* [31].
+- **Flag — contested:** **Schnall et al. 2008 (disgust → moral harshness) [21]** has a well-known *failed*
+  direct replication (Johnson, Cheung & Donnellan 2014 [32]). Treat the moral-harshness probe cautiously,
+  or ground it on Forgas's Affect Infusion Model [22] instead of the disgust-embodiment result.
+- **Age is not the disqualifier:** Johnson & Tversky 1983 [36] is foundational and has held up; the real
+  issues are (a) no code and (b) effect robustness. Cite the 2015 review [31] as the umbrella and keep the
+  primary sources beneath it.
+
+---
+
 ## References
 
 [1] Zou et al. 2023. *Representation Engineering: A Top-Down Approach to AI Transparency.* arXiv:2310.01405
@@ -281,3 +351,11 @@ detector_auroc = roc_auc_score(labels, np.r_[clean, attacked])
 [28] Dunn & Schweitzer 2005. *Feeling and Believing: The Influence of Emotion on Trust.* JPSP
 [29] Harlé & Sanfey 2007. *Incidental Sadness Biases Economic Decisions in the Ultimatum Game.* Emotion
 [30] Wu et al. 2025. *VISOR.* arXiv:2508.08521 *(check)*
+[31] Lerner, Li, Valdesolo & Kassam 2015. *Emotion and Decision Making.* Annual Review of Psychology
+[32] Johnson, Cheung & Donnellan 2014. *Does Cleanliness Influence Moral Judgments? A Direct Replication of Schnall, Benton, and Harvey (2008).* Social Psychology
+[33] Raghunathan & Pham 1999. *All Negative Moods Are Not Equal: Motivational Influences of Anxiety and Sadness on Decision Making.* Organizational Behavior and Human Decision Processes
+[34] Lerner, Small & Loewenstein 2004. *Heart Strings and Purse Strings: Carryover Effects of Emotions on Economic Decisions.* Psychological Science
+[35] Lerner, Goldberg & Tetlock 1998. *Sober Second Thought: The Effects of Accountability, Anger, and Authoritarianism on Attributions of Responsibility.* PSPB
+[36] Johnson & Tversky 1983. *Affect, Generalization, and the Perception of Risk.* JPSP
+[37] DeSteno, Bartlett, Baumann, Williams & Dickens 2010. *Gratitude as Moral Sentiment: Emotion-Guided Cooperation in Economic Exchange.* Emotion
+[38] Ketelaar & Au 2003. *The Effects of Feelings of Guilt on the Behaviour of Uncooperative Individuals in Repeated Social Bargaining Games.* Cognition & Emotion
