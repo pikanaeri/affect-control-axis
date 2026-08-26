@@ -37,6 +37,12 @@ E2E_MODEL="Qwen/Qwen2.5-VL-7B-Instruct" E2E_TIER=full python halli75_algoverse/s
 - **Lock dir** — `E2E_LOCK` pointed at a writable path (single-GPU Colab passes the concurrency check trivially).
 - **XAI_API_KEY** — *only* for the Grok caption-rewrite control in exp03/exp04. Without it those two degrade to a weak literal rewrite (`method: gemma_literal_rewrite`); the rest of the battery needs no judge.
 
+## Colab runner (Drive-persistent) — `notebooks/run_battery_multimodel.ipynb`
+One notebook that does all of the above and **persists everything to Drive**:
+- **EMOTIC** — reused from `MyDrive/affect_refusal/emotic` (or any `*emotic*.zip` already on your Drive) if present; otherwise gdown'd once and the zip + built `train.csv` are **cached to Drive**, so later sessions skip the ~1GB download and mat2py build.
+- **Results** — every run is saved to `MyDrive/affect_refusal/battery_multimodel/<model>/<exp>/` in **Arnav's format**: the full run dir (`results.json`, `heartbeat.json`, checkpoints, `trials.jsonl`, gates), a `STATUS.md` summary (phase/ts/elapsed/gpu/headline/primary), the streamed `run.log`, and a row appended to a rolling `SCOREBOARD.md`.
+- Set `EXP` / `MODEL` / `TIER` in §5 and run top-to-bottom; flip and re-run §5–§7 to sweep models × experiments without overwriting (results are keyed by model+exp).
+
 ## Note
 This is the black-box breadth path. For the causal version, the construct that shows a Qwen signal also
 goes into `visual_affect_battery_robust.ipynb` as a `BATTERY` row → steer/mediation/clean verdict (see
