@@ -20,13 +20,54 @@ LLM judge is used.
 ## Repository layout
 
 ```
-notebooks/   the 3 experiment notebooks (see docs/PROVENANCE.md for what each produces)
-scripts/     figure generation + deck builder + notebook builders (repo-relative paths)
+notebooks/   experiment notebooks — see "Notebooks" below (the 3 pipeline notebooks + earlier exploratory ones)
+scripts/     make_battery_multimodel.py (model-lock patch), validate_notebooks.py (static check), figure/deck builders
 results/     result data files (JSON/CSV) that back every figure
-figures/     11 publication figures (PNG + vector PDF)
-slides/      affect_figures_walkthrough.pptx (18-slide walkthrough with speaker notes)
-docs/        PROVENANCE, METHODS_LITERATURE, RESULTS_WRITEUP, NOVEL_DIRECTIONS_REPORT, sketches/
+figures/     publication figures (PNG + vector PDF)
+slides/      affect_figures_walkthrough.pptx (walkthrough with speaker notes)
+docs/        JOINT_WRITEUP (start here), COOP_EXPERIMENT_SPEC, RUN_BATTERY_MULTIMODEL, METHODS_LITERATURE, NOVELTY_SEARCH, ...
 ```
+
+## Notebooks — how to run (start here)
+
+All three run **top-to-bottom in Colab**, mount Drive, and save to `MyDrive/affect_refusal/`. Set `HF_TOKEN` in Colab secrets first. **Every model must be vision-language** (see Models).
+
+### `run_battery_multimodel.ipynb` — black-box behavioral battery (breadth)
+Clones Arnav's battery, removes its Gemma-only model lock (science untouched), stages EMOTIC (reused from Drive if present, cached if built), and runs the decision experiments on any VLM. Every run is saved to Drive in Arnav's format (`results.json` + `heartbeat.json` + `STATUS.md` + a rolling `SCOREBOARD.md`).
+- **One run:** §5 set `EXP` (exp03/05/06/09/10), `MODEL`, `TIER` (`smoke`/`full`) → §6 runs → §7 saves.
+- **Full sweep:** §8 loops `SWEEP_MODELS × SWEEP_EXPS` (all models × all experiments), continues past failures, writes a `SWEEP_<ts>.json` manifest.
+- **Out:** `battery_multimodel/<model>/<exp>/`.
+
+### `visual_affect_battery_robust.ipynb` — white-box mechanism (depth, causal)
+The affect axis + steering upper-bound + image dose-response + **steer-and-restore mediation** with full controls (bootstrap CIs, K-random null band, coherence gate, massive-activation control, split-half stability). Turns any construct into a *causal* result. OASIS stimuli.
+- **Run:** §1 set `MODELS`; top-to-bottom. Add a construct by appending one row to `BATTERY`.
+- **Out:** `visual_affect_battery_robust.json` + forest figure.
+
+### `emotion_spectrum.ipynb` — the emotion spectrum (6 default / 26 optional)
+Primes the battery with EMOTIC image pools for **6 VAD-spanning emotions** (Fear, Anger, Sadness, Happiness, Peace, Excitement) — or all 26 — and reads continuous V/A/D. Produces the emotion×behavior matrix, a **VAD regression** (does behavior track the dimensions or the label?), and a PCA of emotions into behavioral modes.
+- **Run:** §3 `EMO_SET` (`SIX` default, `CATS26` for the full sweep), §4 `MODEL`.
+- **Out:** `emotion_spectrum/<model>/` (matrix JSON + figure).
+
+*Earlier exploratory notebooks* (`affect_gate_replication`, `behavior_battery`, `emotional_image_effects`, `generation_tone`, `method_compare*`) back the original refusal-gate results and figures; the three above are the current multi-model pipeline.
+
+## Models (all must be vision-language / `-VL`)
+
+The image-prime experiments prepend a picture, so **only VLMs work** — text-only models can't take an image.
+
+| Model | HF id | note |
+|---|---|---|
+| Gemma-4 4B | `google/gemma-4-E4B-it` | Arnav's battery default |
+| Gemma-4 12B | `google/gemma-4-12b-it` | **verify exact id** |
+| Qwen3-VL 2B | `Qwen/Qwen3-VL-2B-Instruct` | **verify exact id** |
+| Qwen3-VL 4B | `Qwen/Qwen3-VL-4B-Instruct` | **verify exact id** |
+| Qwen3-VL 9B | `Qwen/Qwen3-VL-9B-Instruct` | **verify exact id** |
+
+The newer ids may differ on HF; the sweep **logs and skips** any that fail to load, so correct the string and re-run that one. Notebooks install the latest `transformers` so the new architectures load.
+
+## Stress test / smoke run
+
+- **Static (local, no GPU):** `python scripts/validate_notebooks.py` — parses every code cell in every notebook and reports syntax errors + the model ids it finds. Run before sending to the group.
+- **Colab smoke (end-to-end, a few minutes):** in `run_battery_multimodel.ipynb`, run §0–§4, then §5 with `EXP="exp09"`, `MODEL="google/gemma-4-E4B-it"`, `TIER="smoke"`. This exercises the whole path — clone + patch, EMOTIC staging, model load, one experiment, and the Drive save — on the fastest model before you launch the full §8 sweep.
 
 ## Setup
 
@@ -79,6 +120,6 @@ for the full concept → measurement → source-paper table.
 - Defensive-security framing throughout: we measure refusal, never produce harmful output, and use only
   existing benchmarks. No crafted attacks are released.
 
-## Model
+## Original mechanism model
 
-`google/gemma-3-12b-it` (bf16, via TransformerLens `TransformerBridge`; HuggingFace loaders for Tier-2 models).
+The refusal-gate / dose-response results are on `google/gemma-3-12b-it` (bf16, TransformerLens `TransformerBridge`). The current multi-model pipeline runs the five VLMs listed under **Models** above.
