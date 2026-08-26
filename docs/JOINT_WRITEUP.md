@@ -110,6 +110,7 @@ Only the large, interleaved-fusion Gemma shows the refusal gate. `cos(a,r)` does
 - **Cross-modal ladder — the headline control.** Same content as: photo → full caption → stripped caption → emotion label → short narrative. *So far: the photo moves generosity; none of the text versions copy it* → the effect is not the model reading an emotion word. This is the strongest result and the black-box mirror of the white-box image≠text dissociation (§3.4).
 - **Stimulus source.** EMOTIC (depicted emotion) vs. **OASIS (viewer-elicited)** — the mentor's ask. Re-run signal constructs on both, **multiple images per emotion with matched labels**, so no single image drives the effect.
 - **Discrete vs. valence.** Fear vs. anger matched on valence/arousal, to test whether the effect is category-specific or carried by a valence axis (the discrete null so far points to valence).
+- **Full emotion spectrum.** Beyond 4–5 emotions: `notebooks/emotion_spectrum.ipynb` primes the battery with pools for **all 26 EMOTIC categories** and their continuous V/A/D → an emotion×behavior matrix, a **VAD regression** (does behavior track valence/arousal/dominance rather than the label?), and a PCA of emotions into latent behavioral modes.
 - **Negative controls.** MMLU-CF subset + IFEval — behavior should move while capability does **not**, ruling out "any image just distracts the model."
 
 **How each hit feeds the white-box.** Any construct that shows a black-box signal is added as one row to `visual_affect_battery_robust.ipynb`'s `BATTERY` and returns the **causal** version (steering upper-bound, mediation fraction, clean-vs-random verdict). Breadth → depth.
@@ -165,3 +166,19 @@ Each black-box hit thus returns a *causal, CI'd* version. For a fast signal pass
 **White-box (this half):** depth — the affect axis that carries it, the steering upper bound, the mediation, and the image≠text explanation. Turns each black-box hit into a causal result.
 
 *Every construct the battery flags with a signal becomes a mechanism run: steer it, move it with images, restore the axis, watch the effect vanish.*
+
+---
+
+## 10. Roadmap — mechanistic-interpretability analyses (future)
+
+The current mechanism is a single steer/mediation triad on the affect direction. Natural next-layer analyses, building on the same machinery:
+
+- **Per-layer localization.** Where does the image→behavior effect live? Sweep the steer/restore across layers to find the causal band (we have per-layer directions already).
+- **Activation patching / causal tracing.** Patch the affect-carrying activations from an emotional-image run into a neutral run (and vice versa) to localize *which tokens and layers* transmit the effect — not just that a direction mediates it.
+- **Attention analysis.** Does the decision token attend into the image tokens under affective primes? Track attention mass from the answer position to the visual tokens across conditions.
+- **Logit lens on the affect direction.** Project the affect direction through the unembedding to see what vocabulary it promotes/suppresses at the decision step.
+- **Feature decomposition (SAE).** If sparse-autoencoder features are available, decompose the affect axis into interpretable features and test which causally carry behavior.
+- **Per-emotion directions.** Build a direction per EMOTIC category (from `emotion_spectrum.ipynb`) and compare their geometry — do discrete emotions collapse onto a low-dimensional VAD subspace inside the model?
+- **Cross-model alignment.** Are the affect directions/subspaces aligned across model families (Gemma/Qwen/Pixtral), or model-specific?
+
+These sit on top of what's built; each reuses the axis extraction, steering, and mediation already in `visual_affect_battery_robust.ipynb`.
