@@ -5,6 +5,15 @@ vision-language model** (Gemma-3-12B). We find a single internal *affect* direct
 text both engage, that causally changes the model's behavior, and that can be measured and audited
 without ever generating text.
 
+## For the group — quickstart
+
+1. Open **`notebooks/run_battery_multimodel.ipynb`** in Colab and add your **`HF_TOKEN`** to Colab secrets.
+2. Run the **▶ One-click** cell (the first runnable cell) — it installs, stages EMOTIC, and runs **all models × all experiments**, saving documented results to your Drive (`MyDrive/affect_refusal/battery_multimodel/` + `SCOREBOARD.md`). First run downloads ~1GB of EMOTIC once (cached to Drive after).
+3. **Smoke-test first** if you want: set `SWEEP_MODELS=["google/gemma-4-E4B-it"]`, `SWEEP_EXPS=["exp09"]`, `SWEEP_TIER="smoke"` → a few minutes, confirms the whole path.
+4. Read **`docs/JOINT_WRITEUP.md`** for the study and **`docs/RUN_BATTERY_MULTIMODEL.md`** for details.
+
+⚠️ **Verify the model ids** in the Models table below before a full run — the gemma-4-12B / Qwen3-VL ids may need correcting (the sweep logs and skips any that fail to load).
+
 ## Key findings
 
 1. **Shared** — text- and image-derived emotion representations lie on the *same* internal directions.
