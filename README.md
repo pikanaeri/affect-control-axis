@@ -8,7 +8,7 @@ without ever generating text.
 ## For the group — quickstart
 
 1. Open **`notebooks/run_battery_multimodel.ipynb`** in Colab and add your **`HF_TOKEN`** to Colab secrets.
-2. Run the **▶ One-click** cell (the first runnable cell) — it installs, stages EMOTIC, and runs **all models × all experiments**, saving documented results to your Drive (`MyDrive/affect_refusal/battery_multimodel/` + `SCOREBOARD.md`). First run downloads ~1GB of EMOTIC once (cached to Drive after).
+2. Run the **▶ One-click** cell (the first runnable cell) — it installs, stages EMOTIC, and runs **all models × all experiments**, compiling documented results into **`MyDrive/affect_refusal/RESULTS/`** (`battery_multimodel/` + `SCOREBOARD.md`; the emotion-spectrum and white-box notebooks write here too). First run downloads ~1GB of EMOTIC once (cached to Drive after). The runner's §9 cell writes a master `RESULTS/INDEX.md` across everything.
 3. **Smoke-test first** if you want: set `SWEEP_MODELS=["google/gemma-4-E4B-it"]`, `SWEEP_EXPS=["exp09"]`, `SWEEP_TIER="smoke"` → a few minutes, confirms the whole path.
 4. Read **`docs/JOINT_WRITEUP.md`** for the study and **`docs/RUN_BATTERY_MULTIMODEL.md`** for details.
 
