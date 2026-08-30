@@ -29,15 +29,19 @@ def main():
         print(__doc__); return 2
     root = sys.argv[1].rstrip("/\\")
     rows = []
-    for rf in sorted(glob.glob(f"{root}/**/results*.json", recursive=True)):
+    # only the canonical results.json (not results_run1/partial/smoke variants -> one row per model/exp folder)
+    for rf in sorted(glob.glob(f"{root}/**/results.json", recursive=True)):
         try:
             d = json.load(open(rf, encoding="utf-8"))
         except Exception as e:
             print("skip", rf, e); continue
         if isinstance(d, list):
             continue
-        model = d.get("model_id") or d.get("model") or os.path.basename(os.path.dirname(os.path.dirname(rf)))
-        exp = d.get("experiment") or os.path.basename(os.path.dirname(rf))
+        # model from the folder (reliable); model_id in the json can be a dict on partial writes
+        model = os.path.basename(os.path.dirname(os.path.dirname(rf)))
+        if not model:
+            mid = d.get("model_id"); model = mid if isinstance(mid, str) else "?"
+        exp = os.path.basename(os.path.dirname(rf)) or d.get("experiment")
         gs = d.get("gates_summary") or d.get("gates") or {}
         gates = f"{gs.get('passed','?')}/{gs.get('total','?')}" if isinstance(gs, dict) else "?"
         effs = list(sig_effects(d))
