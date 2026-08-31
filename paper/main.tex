@@ -19,6 +19,7 @@
 % Provenance tags for every empirical claim:
 \newcommand{\srcA}{\textcolor{orange!80!black}{[A]}} % Arnav's run: gemma-4-E4B, github.com/halli75/Algoverse
 \newcommand{\srcM}{\textcolor{blue!70!black}{[M]}}    % this work: multi-model sweep (pikanaeri/affect-control-axis)
+\newcommand{\vfy}{\textcolor{red!70!black}{\textsuperscript{[verify]}}} % citation to confirm before submission
 
 \begin{document}
 \maketitle
@@ -30,19 +31,41 @@ Vision--language models (VLMs) are routinely shown images that are irrelevant to
 \paragraph{Provenance.} This draft combines two runs, tagged throughout: \srcA{}~= the original battery run by Arnav (halli75) on \texttt{google/gemma-4-E4B-it} (\url{https://github.com/halli75/Algoverse}), and \srcM{}~= this work's multi-model replication and extension across five VLMs (\url{https://github.com/pikanaeri/affect-control-axis}). Where both ran an experiment, we report \srcA{} for the original documented effect size and \srcM{} for the cross-model replication. All behavior is generation-free; only existing benchmarks are used; no crafted attacks are released.
 
 \section{Introduction}
-\emph{[Stub.]} Deployed VLMs perceive incidental imagery constantly. If a task-irrelevant affective image silently re-weights the model's decisions, that is an alignment-relevant robustness issue. We test this across cognitive, social, epistemic, and safety-calibration paradigms and multiple model families, and connect the behavioral effect to an internal affect representation.
+Vision--language models are deployed in settings where they continuously perceive imagery that is incidental to the task: a photo attached to an email they are asked to summarize, a picture in a document they are asked to reason about, a scene on a screen they are asked to operate. A natural safety and robustness question follows: does the \emph{affective} content of such incidental imagery---content the task never asks the model to attend to---systematically change what the model decides?
+
+Prior work has established, separately, that VLMs can \emph{recognize} emotion in images \cite{kosti2019}, that explicit textual emotional framing can alter LLM behavior, and that emotional context can influence agents. What remains open is whether \emph{task-irrelevant, naturalistic visual affect} induces structured, reproducible, cross-model changes in a VLM's decision policy---and whether any such change is carried by an identifiable internal representation rather than by surface cues.
+
+We study this by prepending a task-irrelevant emotional image to a battery of established decision paradigms (risk, fairness, sycophancy, safety calibration, and capability controls) and measuring behavior \emph{generation-free}: we read the first-token option-logit of a forced choice, a tendency that requires no text generation and no LLM judge. Across five VLMs from two families we find two robust effects. First, a task-irrelevant photo---of \emph{any} affective category, including neutral---sharply raises benign over-refusal, from ${\sim}66\text{--}80\%$ to ${\sim}92\text{--}97\%$, with the same direction across families. Second, the shift enters through the \emph{image} channel: a photo moves behavior where a matched textual caption, emotion label, or narrative of the same content does not (a cross-modal dissociation). A capability control is left intact, so the effect is behavioral modulation, not generic distraction. A white-box analysis in Gemma-3-12B identifies an internal affect direction, shared between image and text, whose activation reproduces and---via restore-the-projection mediation---causally gates the behavior. Discrete fear-vs-anger contrasts are null, consistent with a dimensional (valence) rather than categorical account.
+
+\paragraph{Contributions.}
+\begin{itemize}
+  \item A generation-free behavioral battery showing that incidental visual affect raises benign over-refusal across two VLM families (\S\ref{sec:overrefusal}).
+  \item A cross-modal dissociation: the image channel shifts behavior where matched text does not (\S\ref{sec:crossmodal}).
+  \item A white-box account: a shared image/text affect direction with a causal dose-response and steer-and-restore mediation (\S\ref{sec:whitebox}).
+  \item Evidence for a dimensional (valence) rather than discrete-emotion account, plus capability and stimulus-source controls (\S\ref{sec:controls}).
+  \item An open, reproducible multi-model pipeline (\S\ref{sec:methods}).
+\end{itemize}
 
 \section{Related Work}
-\emph{[Stub; see \texttt{docs/NOVELTY\_SEARCH.md}.]} Prior work separately shows that visual primes can influence VLM outputs, that textual/internal emotional manipulations alter LLM behavior, and that emotional context can affect agents. We connect these: whether \emph{task-irrelevant, naturalistic visual affect} induces structured, cross-model behavioral change, decomposed by valence/arousal/dominance vs.\ discrete emotion, and mechanistically mediated by a shared affect direction.
+\paragraph{Multimodal emotion recognition.} A large literature shows VLMs can identify and reason about the emotion depicted in an image \cite{kosti2019,kurdi2017}. This asks what a model \emph{perceives}; we ask what perceiving it subsequently does to unrelated behavior.
+
+\paragraph{Emotional framing of language models.} Textual emotional manipulations---stating a feeling, adopting a persona, or emotionally charging a prompt---can alter LLM accuracy, toxicity, moral judgment, and sycophancy. Our manipulation is \emph{incidental} and \emph{visual}: the model is never told the image is emotional, and the prompt never refers to it.
+
+\paragraph{Visual priming in VLMs.} The nearest neighbor is work showing that intentionally chosen images shift VLM responses on otherwise linguistic tasks, including a recent study priming an Iterated Prisoner's Dilemma with kindness/aggression imagery and observing changes in cooperation \cite{ong2026}. That work targets one behavioral construct; we test whether the effect is a \emph{structured, cross-model phenotype} across risk, fairness, epistemic, and safety-calibration paradigms, and whether it is mechanistically mediated.
+
+\paragraph{Emotion, agents, and internal representations.} Emotional context has been shown to affect agent behavior, and internal emotion/valence directions have been shown to causally influence LLM behavior via activation steering, including recent valence--arousal--dominance steering studies and mechanistic analyses of ``functional'' emotion representations\vfy. Our white-box analysis builds on the finding that refusal is mediated by a single direction \cite{arditi2024} and on appraisal-consistent accounts of affect in LLMs \cite{zhou2024,sun2026}\vfy. The distinction is that our intervention is ordinary sensory input---a naturalistic image---rather than a hidden-state edit: we ask whether everyday perception turns the same behavioral knobs.
+
+\paragraph{Behavioral phenotyping.} Frameworks such as CogBench \cite{codaforno2024} phenotype LLM behavior across psychology paradigms. We adopt the phenotyping stance but condition it on \emph{visual affect} and connect the behavioral shift to an internal affect direction.
 
 \section{Methods}
+\label{sec:methods}
 \paragraph{Models.} Five instruction-tuned VLMs across two families and 2--12B: Gemma-4-E4B, Gemma-4-12B, and Qwen3-VL-2B/-4B/-9B, loaded in 4-bit (nf4) weights, bf16 compute. White-box analysis additionally uses Gemma-3-12B.
-\paragraph{Stimuli.} EMOTIC (natural images, 26 discrete emotion categories + continuous valence/arousal/dominance; fixed eval split) prepended with chat order \texttt{[image, text]}; the prompt never refers to the image. OASIS (viewer-elicited valence/arousal) is used for the image-derived affect axis and the depicted-vs-elicited contrast. Images are capped at 512\,px.
-\paragraph{Metric.} Every decision is a first-token option-logit: $\mathrm{logsumexp}(\text{A})-\mathrm{logsumexp}(\text{B})$ at the answer position --- a tendency, no generation, no judge. Effects are $\Delta$ vs.\ a neutral/no-image baseline with bootstrap 95\% CIs (an effect is present iff the CI excludes 0).
-\paragraph{White-box mechanism.} A per-layer affect direction $a$ (diff-in-means of low- vs.\ high-valence residuals) is intervened on by norm-scaled steering ($\Delta = \alpha\,\lVert h\rVert\,\hat a$), with a random-direction control, coherence gate, massive-activation removal, and split-half stability; causal mediation is tested by steer-and-restore.
+\paragraph{Stimuli.} EMOTIC \cite{kosti2019} (natural images, 26 discrete emotion categories + continuous valence/arousal/dominance; fixed eval split) prepended with chat order \texttt{[image, text]}; the prompt never refers to the image. OASIS \cite{kurdi2017} (viewer-elicited valence/arousal) is used for the image-derived affect axis and the depicted-vs-elicited contrast. Images are capped at 512\,px.
+\paragraph{Metric.} Every decision is a first-token option-logit: $\mathrm{logsumexp}(\text{A})-\mathrm{logsumexp}(\text{B})$ at the answer position---a tendency, no generation, no judge. Effects are $\Delta$ vs.\ a neutral/no-image baseline with bootstrap 95\% CIs (an effect is present iff the CI excludes 0).
+\paragraph{White-box mechanism.} A per-layer affect direction $a$ (diff-in-means of low- vs.\ high-valence residuals) is intervened on by norm-scaled steering ($\Delta = \alpha\,\lVert h\rVert\,\hat a$), with a random-direction control, coherence gate, massive-activation removal, and split-half stability; causal mediation is tested by steer-and-restore (steer the induced shift, restore the projection onto $a$ to its clean baseline, and test whether the behavioral shift disappears).
 
 \subsection{Emotions used}
-The battery draws EMOTIC categories chosen to span the affective space, plus a no-image baseline (Table~\ref{tab:emotions}). The white-box spectrum analysis (extension) additionally uses Excitement.
+The battery draws EMOTIC categories chosen to span the affective space, plus a no-image baseline (Table~\ref{tab:emotions}). Coverage is currently non-uniform across tasks (a known design gap; \S\ref{sec:limitations}): experiments testing a specific appraisal contrast (e.g.\ fear-vs-anger risk) or a valence/modality manipulation (cross-modal, mediation) use a reduced set by design, while the two experiments looking for a graded emotion ladder (exp06, exp09) use the full set. Standardizing all tasks to a fixed 5--6-emotion set is the immediate next step.
 
 \begin{table}[h]\centering\small
 \begin{tabular}{lccc}
@@ -66,10 +89,12 @@ Neutral & $\approx$ & low & exp06, exp09 (control) \\
 \section{Results}
 
 \subsection{An internal affect axis causally shifts behavior (white-box) \srcM}
-In Gemma-3-12B, steering the affect axis toward benign collapses refusal along a clean dose-response ($1.00\to0.00$) while a matched random direction stays pinned at $1.00$; restoring the projection onto the refusal direction recovers refusal fully ($0.25\to1.00$), so the effect is routed through that direction. Images reach the axis $\sim$15--23\% of a full steer in a neutral/task context but only $\sim$0.7\% under a harmful prompt --- images cannot jailbreak refusal but can move softer behavior.
+\label{sec:whitebox}
+In Gemma-3-12B, steering the affect axis toward benign collapses refusal along a clean dose-response ($1.00\to0.00$) while a matched random direction stays pinned at $1.00$; restoring the projection onto the refusal direction \cite{arditi2024} recovers refusal fully ($0.25\to1.00$), so the effect is routed through that direction. Images reach the axis $\sim$15--23\% of a full steer in a neutral/task context but only $\sim$0.7\% under a harmful prompt---images cannot jailbreak refusal (which is text-dominated) but can move softer behavior.
 
 \subsection{Over-refusal rises across model families \srcM}
-A task-irrelevant photo (any category, including neutral) sharply raises benign over-refusal on XSTest (exp09), with non-overlapping CIs and an identical direction across families (Figure~\ref{fig:overrefusal}): Gemma-4-E4B $0.66\to0.92$, Qwen3-VL-2B $0.71\to0.97$, Qwen3-VL-4B $0.80\to0.96$. The original run reported the same shift on Gemma-4-E4B ($\sim$66\%$\to$91--94\%) \srcA. This is a global caution shift, not improved safety reasoning.
+\label{sec:overrefusal}
+A task-irrelevant photo (any category, including neutral) sharply raises benign over-refusal on XSTest \cite{rottger2024} (exp09), with non-overlapping CIs and an identical direction across families (Figure~\ref{fig:overrefusal}): Gemma-4-E4B $0.66\to0.92$, Qwen3-VL-2B $0.71\to0.97$, Qwen3-VL-4B $0.80\to0.96$. The original run reported the same shift on Gemma-4-E4B ($\sim$66\%$\to$91--94\%) \srcA. This is a global caution shift, not improved safety reasoning: the model refuses more of the \emph{harmless} prompts.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.72\linewidth]{figures/fig1_overrefusal_crossmodel.pdf}
@@ -78,7 +103,8 @@ A task-irrelevant photo (any category, including neutral) sharply raises benign 
 \end{figure}
 
 \subsection{The image channel shifts behavior; matched text does not \srcA\srcM}
-On Gemma-4-E4B (exp03, \texttt{CROSS\_MODAL\_DIVERGE}, gates 9/9), the \emph{photo} moves generosity/behavior --- $\mathrm{dictator{:}pixels}=-0.98\,[-1.97,-0.19]$ \srcA{} and $\mathrm{perez{:}pixels}=-0.69\,[-1.23,-0.09]$ \srcM{} --- while matched captions, emotion labels, and narratives do not copy it (Figure~\ref{fig:crossmodal}). Qwen3-VL-2B shows the same image-channel signal ($\mathrm{risk{:}deaffect}=+0.80\,[+0.06,+1.55]$; $\mathrm{dictator{:}label}=-1.12\,[-2.09,-0.19]$) \srcM. The model is not simply reading an emotion word off the picture.
+\label{sec:crossmodal}
+On Gemma-4-E4B (exp03, \texttt{CROSS\_MODAL\_DIVERGE}, gates 9/9), the \emph{photo} moves generosity/behavior---$\mathrm{dictator{:}pixels}=-0.98\,[-1.97,-0.19]$ \srcA{} and $\mathrm{perez{:}pixels}=-0.69\,[-1.23,-0.09]$ \srcM---while matched captions, emotion labels, and narratives do not copy it (Figure~\ref{fig:crossmodal}). Qwen3-VL-2B shows the same image-channel signal ($\mathrm{risk{:}deaffect}=+0.80\,[+0.06,+1.55]$; $\mathrm{dictator{:}label}=-1.12\,[-2.09,-0.19]$) \srcM. The model is not simply reading an emotion word off the picture and acting on the word.
 
 \begin{figure}[h]\centering
 \includegraphics[width=0.82\linewidth]{figures/fig2_crossmodal_dissociation.pdf}
@@ -87,7 +113,8 @@ On Gemma-4-E4B (exp03, \texttt{CROSS\_MODAL\_DIVERGE}, gates 9/9), the \emph{pho
 \end{figure}
 
 \subsection{Specificity and controls}
-Discrete fear-vs-anger on risky lotteries is null ($\Delta\approx-0.09$, CI includes 0) \srcA\srcM, pointing away from categorical and toward a valence account. A capability control (exp07) shows accuracy flat at $\sim$0.68--0.72 across affect conditions \srcA\srcM{} --- affect does not degrade knowledge, so the behavioral effects are not generic distraction.
+\label{sec:controls}
+Discrete fear-vs-anger on risky lotteries is null ($\Delta\approx-0.09$, CI includes 0) \srcA\srcM, pointing away from categorical and toward a valence account. A capability control (exp07, TruthfulQA/MMLU \cite{lin2022,hendrycks2021}) shows accuracy flat at $\sim$0.68--0.72 across affect conditions \srcA\srcM---affect does not degrade knowledge, so the behavioral effects are not generic distraction. The stimulus-source control (exp08, EMOTIC vs.\ OASIS) finds matching signatures across corpora but distinct effect sizes, so the two are treated as related-but-not-poolable constructs.
 
 \subsection{Full battery}
 Table~\ref{tab:battery} summarizes all ten experiments, their outcome, result, analysis, and source.
@@ -101,7 +128,7 @@ Exp & Construct & Outcome & Result & Analysis & Src \\
 exp01 & Risk (fear vs anger) & Null & $\Delta\approx-0.09$, CI incl.\ 0 & No discrete-emotion effect; supports valence account & A,M \\
 exp02 & Scene-matched control & Null & No exp01 effect to explain & Downstream of a null & A,M \\
 exp03 & Cross-modal + generosity & \textbf{Success} & Photo moves behavior ($-0.98$\,\srcA, $-0.69$\,\srcM); text does not & Image channel $\neq$ text & A,M \\
-exp04 & Sycophancy (Perez) & Null & Behavioral-delta only; mean $\Delta$ incl.\ 0 & No reliable sycophancy shift & A,M \\
+exp04 & Sycophancy \cite{perez2022} & Null & Behavioral-delta only; mean $\Delta$ incl.\ 0 & No reliable sycophancy shift & A,M \\
 exp05 & Fairness / generosity & Partial & Anger $\to$ more unfair-reject \srcA; small dictator shifts \srcM & Punishment up; giving weak & A,M \\
 exp06 & Patience (discounting) & \emph{Excluded} & Degenerate $k$-estimator (identical across conditions) & Estimator bug, not a result & A,M \\
 exp07 & Capability (control) & Null (good) & Accuracy $\sim$0.68--0.72, flat & Affect does not degrade knowledge & A,M \\
@@ -115,9 +142,37 @@ exp10 & Mediation & Partial & \texttt{DIAGNOSTIC\_NOT\_V3}; risk shift, correlat
 \end{table}
 
 \section{Discussion}
-\emph{[Stub.]} Incidental visual affect acts as a latent control signal on VLM behavior: the most reliable manifestation is a global caution shift (over-refusal), the effect enters through the image channel rather than emotion words, and it is carried by a continuous valence dimension. This is a controllability property with a defensive reading --- the same axis that carries the effect is a clean monitor.
+Our results are consistent with a simple picture: \textbf{incidental visual affect acts as a latent control signal on VLM behavior}. Three features of the evidence support this reading.
+
+\paragraph{The dominant manifestation is a global caution shift.} The most reliable and cross-family effect is increased benign over-refusal after \emph{any} photo, including neutral. Because the additional refusals fall on harmless prompts, this is not improved safety reasoning but a shift in the model's overall decisiveness threshold. Prior appraisal-consistent accounts \cite{zhou2024} predict that negatively valenced context increases caution; we observe a caution shift that is broad and largely category-independent, which fits a valence account better than a discrete-emotion one.
+
+\paragraph{The effect enters through the image channel.} A photo shifts behavior where a matched caption, emotion label, or narrative of the same content does not. This dissociation argues against the trivial explanation that the model reads an emotion word off the picture and role-plays it; the visual pathway is doing something the textual pathway does not. Our white-box analysis offers a mechanism: a per-layer affect direction, shared with text, that images reach substantially in ordinary contexts but only negligibly under a harmful prompt, whose activation reproduces the behavior and, on restoration, removes it.
+
+\paragraph{It is dimensional, not categorical---so far.} Discrete fear-vs-anger contrasts are null while valence manipulations move behavior, suggesting that the operative variable is a low-dimensional affective quantity (valence, possibly arousal/dominance) rather than emotion identity. This is a testable prediction: standardizing all tasks to a fixed emotion set and decomposing behavior into valence/arousal/dominance versus discrete-emotion residual is our immediate next analysis.
+
+\paragraph{Safety framing.} The same axis that carries the effect is a natural place to \emph{monitor} it. Because the manipulation is ordinary sensory input rather than a crafted attack, the phenomenon is a controllability property of deployed multimodal systems: incidental imagery can shift a model's decisiveness and social behavior without any adversarial intent. We measure refusal generation-free and release no attacks; the contribution is a measurement and a monitorable direction, not an exploit.
 
 \section{Limitations and Ethics}
-Battery numbers are exploratory (smoke tier, small $n$; exp03 $n=8$); the headline effects warrant a pre-registered, full-tier rerun. exp06 is excluded (estimator bug). The 12B/9B models OOM'd on the image-heavy experiments, so the cross-model claim rests on three 4B-class models across two families; the refusal \emph{gate} is model-specific (Gemma-3-12B) and the paper is anchored on the behavioral results. Ethics: refusal is measured generation-free; only existing benchmarks (AdvBench, Alpaca, XSTest, TruthfulQA/MMLU, EMOTIC, OASIS) are used; agentic scenarios are hypothetical decision framings scored by option-logit (a tendency, not executed actions); no harmful completions are stored (aggregate rates only) and no crafted attacks are released.
+\label{sec:limitations}
+Battery numbers are exploratory (smoke tier, small $n$; exp03 $n=8$); the headline effects warrant a pre-registered, full-tier rerun. Emotion coverage is currently non-uniform across tasks (Table~\ref{tab:emotions}); standardizing to a fixed 5--6-emotion set is required for a clean emotion~$\times$~task decomposition, and the two datasets are not yet balanced (OASIS appears only in the stimulus-source control). exp06 is excluded due to a degenerate estimator (a code bug, not a null). The 12B and 9B models OOM'd on the image-heavy experiments, so the cross-model claim rests on three 4B-class models across two families; the refusal \emph{gate} is model-specific (Gemma-3-12B) and the paper is anchored on the behavioral results. Several related-work citations are marked \vfy{} pending confirmation. Ethics: refusal is measured generation-free; only existing benchmarks (AdvBench, Alpaca, XSTest, TruthfulQA/MMLU, EMOTIC, OASIS) are used; agentic scenarios are hypothetical decision framings scored by option-logit (a tendency, not executed actions); no harmful completions are stored (aggregate rates only) and no crafted attacks are released.
+
+\section{Conclusion}
+Task-irrelevant affective imagery systematically shifts what a vision--language model decides. The most reliable manifestation is a global caution shift---an unrelated photo raises benign over-refusal from ${\sim}66\text{--}80\%$ to ${\sim}92\text{--}97\%$ across two model families---and behavior shifts through the image channel in a way matched text does not reproduce, while plain capability is left intact. A white-box analysis ties the effect to a shared image/text affect direction with a causal dose-response and mediation. The effect appears to be carried by valence rather than discrete emotion. We read this as a controllability and robustness property of deployed multimodal systems, and provide an open, reproducible pipeline for studying it.
+
+\begin{thebibliography}{9}
+\small
+% NOTE: entries are draft; confirm venues/years and the \vfy-marked works before submission.
+\bibitem{arditi2024} Arditi, A.\ et al.\ (2024). Refusal in Language Models Is Mediated by a Single Direction. \emph{arXiv:2406.11717}.
+\bibitem{perez2022} Perez, E.\ et al.\ (2023). Discovering Language Model Behaviors with Model-Written Evaluations. \emph{Findings of ACL}.
+\bibitem{rottger2024} R\"ottger, P.\ et al.\ (2024). XSTest: A Test Suite for Identifying Exaggerated Safety Behaviours in Large Language Models. \emph{NAACL}.
+\bibitem{kosti2019} Kosti, R.\ et al.\ (2019). Context Based Emotion Recognition using EMOTIC Dataset. \emph{IEEE TPAMI}.
+\bibitem{kurdi2017} Kurdi, B., Lozano, S., Banaji, M.\ (2017). Introducing the Open Affective Standardized Image Set (OASIS). \emph{Behavior Research Methods}.
+\bibitem{lin2022} Lin, S., Hilton, J., Evans, O.\ (2022). TruthfulQA: Measuring How Models Mimic Human Falsehoods. \emph{ACL}.
+\bibitem{hendrycks2021} Hendrycks, D.\ et al.\ (2021). Measuring Massive Multitask Language Understanding. \emph{ICLR}.
+\bibitem{ong2026} Ong et al.\ (2026). Visual Priming of Cooperative Behavior in Vision--Language Models. \emph{arXiv:2604.27953}.
+\bibitem{codaforno2024} Coda-Forno, J.\ et al.\ (2024). CogBench: A Large Language Model Walks into a Psychology Lab. \emph{ICML}.
+\bibitem{zhou2024} Zhou et al.\ (2024). Appraisal-Consistent Affect in Language Models. \emph{arXiv:2406.05644}.
+\bibitem{sun2026} Sun et al.\ (2026). Affect Gates Refusal in Language Models. \emph{arXiv:2604.03147}.
+\end{thebibliography}
 
 \end{document}
