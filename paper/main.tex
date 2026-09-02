@@ -70,7 +70,23 @@ A task-irrelevant photograph raises refusal on XSTest-safe items \citep{rottger2
 
 \subsection{A non-affective image raises refusal too}
 \label{sec:staticnull}
-If the effect were affect, non-affective imagery should not reproduce it. We ran the same benign items with synthetic non-affective arms (a gray square, random noise, and a geometric diagram) alongside a real EMOTIC photo. \emph{[Result to be filled from the static-image-null run: report the refuse rate for no-image vs.\ gray/noise/geometric vs.\ EMOTIC; the prediction under photo-presence is that synthetic non-affective images raise refusal comparably to EMOTIC.]} A \emph{neutral} EMOTIC photograph already sits in the photo cluster (Figure~\ref{fig:overrefusal}), consistent with presence rather than depicted emotion.
+If the effect were affect, non-affective imagery should not reproduce it. We ran the same benign items ($n=20$, full-answer scorer) with synthetic non-affective arms---a gray square, random noise, and a geometric diagram---alongside a real EMOTIC photo (Table~\ref{tab:staticnull}). On the two models that refuse at all, the synthetic non-affective images raise refusal comparably to, or above, the EMOTIC photo: on Qwen3-VL-2B, from $0.00$ (no image) to $0.45$/$0.50$/$0.65$ for gray/noise/geometric vs.\ $0.75$ for the photo; on Gemma-4-E4B, from $0.00$ to $0.05$/$0.05$/$0.20$ vs.\ $0.15$. On both models the plain geometric diagram raises refusal at least as much as the emotional photograph. A gray square carries no emotion; that it raises refusal like a photograph is direct evidence that the operative variable is image \emph{presence}, not depicted emotion. A \emph{neutral} EMOTIC photograph likewise sits in the photo cluster (Figure~\ref{fig:overrefusal}).
+
+\begin{table}[t]
+\caption{Non-affective image control (full-answer refusal on benign items, $n=20$). A gray square, random noise, and a geometric diagram raise refusal like an EMOTIC photo; the diagram matches or exceeds the photo. Qwen3-VL-4B does not refuse these items.}
+\label{tab:staticnull}
+\centering
+\footnotesize
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Model & no image & gray & noise & geometric & EMOTIC photo \\
+\midrule
+Gemma-4-E4B & $0.00$ & $0.05$ & $0.05$ & $0.20$ & $0.15$ \\
+Qwen3-VL-2B & $0.00$ & $0.45$ & $0.50$ & $0.65$ & $0.75$ \\
+Qwen3-VL-4B & $0.00$ & $0.00$ & $0.00$ & $0.00$ & $0.00$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{The affect axis reconstructs its own contrast}
 \label{sec:circular}
