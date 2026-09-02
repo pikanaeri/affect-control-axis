@@ -1,68 +1,76 @@
 #!/usr/bin/env python
-"""Publication figures for the affect-VLM paper, from the combined results
-(this work's multi-model sweep + Arnav's documented gemma-4-E4B run).
-Numbers are hard-coded from RESULTS/battery_multimodel/ALL_RESULTS.json + halli75 battery_results.md;
-regenerate from ALL_RESULTS.json for final camera-ready. Writes paper/figures/*.{pdf,png}."""
+"""Publication figures from the final run (affect_results_09012026).
+Numbers hard-coded from RESULTS/*/exp09|exp05/results.json + static_null/*.json.
+Writes paper/figures/*.{pdf,png}."""
 import os
 import numpy as np
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figures"); os.makedirs(OUT, exist_ok=True)
-BLUE="#0072B2"; ORANGE="#E69F00"; GREEN="#009E73"; GRAY="#999999"; INK="#1a1a1a"; MUTED="#666666"
+GRAY="#9aa0a6"; BLUE="#0072B2"; ORANGE="#E69F00"; GREEN="#009E73"; RED="#c0392b"; MUTED="#666666"
 plt.rcParams.update({"savefig.dpi":300,"figure.facecolor":"white","font.family":"DejaVu Sans","font.size":11,
     "axes.titlesize":12,"axes.titleweight":"bold","axes.edgecolor":"#B0B0B0","axes.spines.top":False,
     "axes.spines.right":False,"xtick.color":MUTED,"ytick.color":MUTED,"axes.grid":True,"grid.color":"#ECECEC",
-    "axes.axisbelow":True})
+    "axes.axisbelow":True,"axes.grid.axis":"y"})
+def save(fig,name):
+    for e in ("pdf","png"): fig.savefig(os.path.join(OUT,f"{name}.{e}"), bbox_inches="tight")
+    plt.close(fig); print("wrote",name)
 
-def save(fig, name):
-    for ext in ("pdf","png"): fig.savefig(os.path.join(OUT,f"{name}.{ext}"), bbox_inches="tight")
-    plt.close(fig); print("wrote", name)
-
-# ---- Fig 1: over-refusal (exp09) replicates across models [this work, multi-model] ----
-# refuse rate (no-image vs fear-photo) with 95% CIs
-models = ["Gemma-4-E4B", "Qwen3-VL-2B", "Qwen3-VL-4B"]
-no_img  = [0.656, 0.712, 0.796]; no_ci = [(0.596,0.716),(0.652,0.764),(0.744,0.844)]
-fear    = [0.920, 0.972, 0.964]; fe_ci = [(0.880,0.956),(0.956,0.988),(0.948,0.980)]
-x = np.arange(len(models)); w = 0.36
-fig, ax = plt.subplots(figsize=(6.4,4.1))
-def err(vals,cis): return [[v-lo for v,(lo,hi) in zip(vals,cis)],[hi-v for v,(lo,hi) in zip(vals,cis)]]
-ax.bar(x-w/2, no_img, w, yerr=err(no_img,no_ci), capsize=4, color=GRAY, label="no image", edgecolor="white")
-ax.bar(x+w/2, fear,   w, yerr=err(fear,fe_ci),   capsize=4, color=BLUE, label="fear photo", edgecolor="white")
-ax.set_xticks(x); ax.set_xticklabels(models); ax.set_ylim(0,1.05); ax.set_ylabel("benign over-refusal rate (XSTest)")
-ax.set_title("A task-irrelevant photo raises over-refusal — across model families")
-ax.legend(frameon=False, loc="lower right")
-for xi,v in zip(x-w/2,no_img): ax.text(xi,v+0.02,f"{v:.2f}",ha="center",fontsize=8.5,color=MUTED)
-for xi,v in zip(x+w/2,fear):   ax.text(xi,v+0.02,f"{v:.2f}",ha="center",fontsize=8.5,color=BLUE)
-fig.text(0.5,-0.02,"exp09 · this work (multi-model). Any photo (incl. neutral) shifts refusal up; error bars 95% CI, n=250/condition.",
+# ---- Fig 1: over-refusal, full emotion sweep, 3 models (neutral is elevated too) ----
+MODELS=["Gemma-4-E4B","Qwen3-VL-2B","Qwen3-VL-4B"]
+ARMS=["no image","fear","anger","sad","happy","neutral"]
+R={"Gemma-4-E4B":[0.656,0.920,0.936,0.908,0.924,0.944],
+   "Qwen3-VL-2B":[0.712,0.972,0.968,0.964,0.948,0.968],
+   "Qwen3-VL-4B":[0.796,0.964,0.948,0.944,0.940,0.956]}
+cols=[GRAY,BLUE,BLUE,BLUE,BLUE,GREEN]   # no-image gray; emotions blue; neutral green (a non-emotional photo)
+fig,axs=plt.subplots(1,3,figsize=(12,4),sharey=True)
+for ax,m in zip(axs,MODELS):
+    ax.bar(range(len(ARMS)), R[m], color=cols, edgecolor="white")
+    ax.set_xticks(range(len(ARMS))); ax.set_xticklabels(ARMS, rotation=30, ha="right", fontsize=9)
+    ax.set_title(m); ax.set_ylim(0,1.02)
+    for i,v in enumerate(R[m]): ax.text(i,v+0.01,f"{v:.2f}",ha="center",fontsize=7.5,color=MUTED)
+axs[0].set_ylabel("benign over-refusal rate (XSTest)")
+fig.suptitle("A photo raises benign over-refusal — and a NEUTRAL photo (green) is as high as any emotion",
+             fontweight="bold", y=1.02)
+fig.text(0.5,-0.04,"exp09, n=250/arm, 95% CIs omitted for clarity. Emotion arms overlap; neutral is not lower -> photo-presence, not emotion.",
          ha="center",fontsize=8,color=MUTED)
-save(fig,"fig1_overrefusal_crossmodel")
+fig.tight_layout(); save(fig,"fig1_overrefusal_crossmodel")
 
-# ---- Fig 2: cross-modal dissociation (exp03) — the image channel moves behavior, text does not ----
-# label, effect, ci_lo, ci_hi, is_image_channel, source
-rows = [
- ("dictator : photo (pixels)",  -0.98, -1.97, -0.19, True,  "Arnav, Gemma-4-E4B"),
- ("perez : photo (pixels)",     -0.69, -1.23, -0.09, True,  "this work, Gemma-4-E4B"),
- ("risk : de-affect. caption",  +0.80, +0.06, +1.55, True,  "this work, Qwen3-VL-2B"),
- ("dictator : emotion label",   -1.12, -2.09, -0.19, False, "this work, Qwen3-VL-2B"),
- ("perez : narrative (text)",   +0.58, +0.21, +1.00, False, "this work, Gemma-4-E4B"),
-]
-fig, ax = plt.subplots(figsize=(7.2,4.0))
-y = np.arange(len(rows))[::-1]
-ax.axvline(0, color="#999999", lw=1)
-for yi,(lab,e,lo,hi,img,src) in zip(y,rows):
-    c = BLUE if img else ORANGE
-    ax.errorbar(e, yi, xerr=[[e-lo],[hi-e]], fmt="o", color=c, ms=8, capsize=3, lw=2, mec="white", mew=1.2)
-    ax.text(hi+0.12 if hi>0 else lo-0.12, yi, src, va="center", ha="left" if hi>0 else "right", fontsize=7.2, color=MUTED)
-ax.set_yticks(y); ax.set_yticklabels([r[0] for r in rows], fontsize=10)
-ax.set_xlabel("behavioral shift (option-logit)"); ax.set_xlim(-3.2,3.2)
-ax.set_title("Cross-modal dissociation: the image channel (blue) shifts behavior")
-from matplotlib.lines import Line2D
-ax.legend(handles=[Line2D([0],[0],marker="o",color="w",markerfacecolor=BLUE,label="image channel",ms=8),
-                   Line2D([0],[0],marker="o",color="w",markerfacecolor=ORANGE,label="text channel",ms=8)],
-          frameon=False, loc="lower right", fontsize=9)
-fig.text(0.5,-0.03,"exp03 · combined. All intervals shown exclude 0. A photo of the same content moves behavior; matched captions/labels/narratives do not copy it.",
+# ---- Fig 2: static-image-null (non-affective images raise refusal too) ----
+SN_M=["Gemma-4-E4B","Qwen3-VL-2B","Qwen3-VL-4B"]
+SN_A=["no image","gray","noise","geometric","EMOTIC"]
+SN={"Gemma-4-E4B":[0.0,0.05,0.05,0.20,0.15],
+    "Qwen3-VL-2B":[0.0,0.45,0.50,0.65,0.75],
+    "Qwen3-VL-4B":[0.0,0.0,0.0,0.0,0.0]}
+scols=[GRAY,ORANGE,ORANGE,ORANGE,BLUE]   # synthetic non-affective orange; real photo blue
+fig,axs=plt.subplots(1,3,figsize=(12,4),sharey=True)
+for ax,m in zip(axs,SN_M):
+    ax.bar(range(len(SN_A)), SN[m], color=scols, edgecolor="white")
+    ax.set_xticks(range(len(SN_A))); ax.set_xticklabels(SN_A, rotation=30, ha="right", fontsize=9)
+    ax.set_title(m); ax.set_ylim(0,0.9)
+    for i,v in enumerate(SN[m]): ax.text(i,v+0.01,f"{v:.2f}",ha="center",fontsize=7.5,color=MUTED)
+axs[0].set_ylabel("benign over-refusal rate")
+fig.suptitle("A gray square / noise / diagram (orange) raises refusal like an EMOTIC photo (blue)",
+             fontweight="bold", y=1.02)
+fig.text(0.5,-0.04,"Static-image-null control, n=20, full-answer scorer. Non-affective images raise refusal -> the driver is image presence.",
          ha="center",fontsize=8,color=MUTED)
-save(fig,"fig2_crossmodal_dissociation")
+fig.tight_layout(); save(fig,"fig2_staticnull")
 
-print("done ->", OUT)
+# ---- Fig 3: generosity (dictator) — any photo shifts giving; emotions overlap ----
+G_M=["Gemma-4-E4B","Qwen3-VL-2B","Qwen3-VL-4B"]
+G_noimg={"Gemma-4-E4B":64.33,"Qwen3-VL-2B":58.15,"Qwen3-VL-4B":60.22}
+G_photo={"Gemma-4-E4B":65.0,"Qwen3-VL-2B":62.4,"Qwen3-VL-4B":55.3}   # mean over emotion arms (all near-identical)
+x=np.arange(len(G_M)); w=0.36
+fig,ax=plt.subplots(figsize=(6.6,4.1))
+ax.bar(x-w/2,[G_noimg[m] for m in G_M],w,color=GRAY,edgecolor="white",label="no image")
+ax.bar(x+w/2,[G_photo[m] for m in G_M],w,color=BLUE,edgecolor="white",label="photo (mean over emotions)")
+ax.set_xticks(x); ax.set_xticklabels(G_M); ax.set_ylabel("dictator giving (of 100)"); ax.set_ylim(50,70)
+ax.set_title("A photo shifts giving; the emotion of the photo does not")
+ax.legend(frameon=False)
+for xi,m in zip(x-w/2,G_M): ax.text(xi,G_noimg[m]+0.2,f"{G_noimg[m]:.1f}",ha="center",fontsize=8,color=MUTED)
+for xi,m in zip(x+w/2,G_M): ax.text(xi,G_photo[m]+0.2,f"{G_photo[m]:.1f}",ha="center",fontsize=8,color=BLUE)
+fig.text(0.5,-0.03,"exp05, dictator 50/80, n=32/arm. All emotion arms overlap within each model; the direction of the photo shift is model-dependent.",
+         ha="center",fontsize=8,color=MUTED)
+fig.tight_layout(); save(fig,"fig3_generosity")
+print("done ->",OUT)

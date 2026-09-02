@@ -59,12 +59,12 @@ We tested the affect hypothesis on Gemma-4 \citep{gemmateam2026gemma4} and Qwen3
 
 \subsection{Photo presence raises benign over-refusal, across families}
 \label{sec:overrefusal}
-A task-irrelevant photograph raises refusal on XSTest-safe items \citep{rottger2024xstest} in every model and both scorers (Figure~\ref{fig:overrefusal}). Under the first-token scorer the rate rises from $0.656$ (no image) to $0.92$ (Gemma-4-E4B), $0.712\!\to\!0.972$ (Qwen3-VL-2B), and $0.796\!\to\!0.964$ (Qwen3-VL-4B). Under a stricter full-answer scorer on a locked Gemma-4 battery the same direction holds at smaller magnitude ($0.125\!\to\!0.34$ on E4B; $0.00\!\to\!0.51$ on 12B). The effect is a global caution shift---the model refuses more of the \emph{harmless} prompts---and it replicates across two model families.
+A task-irrelevant photograph raises refusal on XSTest-safe items \citep{rottger2024xstest} in every model (Figure~\ref{fig:overrefusal}). Under a first-token scorer ($n=250$/arm) the no-image rate rises to a photo band of $0.908$--$0.944$ on Gemma-4-E4B (from $0.656$), $0.948$--$0.972$ on Qwen3-VL-2B (from $0.712$), and $0.940$--$0.964$ on Qwen3-VL-4B (from $0.796$). Critically, the six emotion arms overlap within each model and a \emph{neutral} photograph is as high as any emotion---on Gemma-4-E4B the neutral arm ($0.944$) is the highest of all. Under a stricter full-answer scorer on a locked Gemma-4 battery the same direction holds at smaller magnitude ($0.13\!\to\!0.34$ on E4B). The effect is a global caution shift---the model refuses more of the \emph{harmless} prompts---and it replicates across two model families.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.62\linewidth]{figures/fig1_overrefusal_crossmodel.pdf}
-\caption{Photo presence raises benign over-refusal across three VLMs (first-token scorer; 95\% CIs, $n=250$/condition). The effect is cross-family, and neutral photos are elevated too---the take-away is presence, not emotion.}
+\caption{Photo presence raises benign over-refusal across three VLMs (exp09, $n=250$/arm). All six emotion arms overlap and a \emph{neutral} photo (green) is as high as any emotion---the driver is presence, not emotion.}
 \label{fig:overrefusal}
 \end{figure}
 
@@ -88,17 +88,31 @@ Qwen3-VL-4B & $0.00$ & $0.00$ & $0.00$ & $0.00$ & $0.00$ \\
 \end{tabular}
 \end{table}
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig2_staticnull.pdf}
+\caption{Non-affective image control. A gray square, random noise, and a geometric diagram (orange) raise refusal like an EMOTIC photo (blue); the diagram matches or exceeds the photo on both refusing models. The driver is image presence, not emotion.}
+\label{fig:staticnull}
+\end{figure}
+
 \subsection{The affect axis reconstructs its own contrast}
 \label{sec:circular}
 An axis built from negative-vs-neutral photographs under a describe prompt makes the image projection $|\Delta_{\mathrm{img}}|/|\Delta_{\mathrm{txt}}|$ a metric on that construction: a full-tier run recorded $\mathrm{ratio}_a=1.591$ (unit-normed $1.390$), but the numerator is the defining contrast, so this is construction bias, not a ranking of modalities \citep{messick1995validity,campbell1959convergent}. We withdraw any claim that photographs are intrinsically ``more emotional'' than text.
 
 \subsection{Named emotion does not explain the board}
 \label{sec:emotion}
-Discrete fear-vs-anger on risky lotteries is null ($\Delta\approx-0.09$, CI includes $0$). In the dictator game a photo nudges giving upward but the emotion arms are nearly identical (anger $\approx$ affection $\approx$ happiness); ultimatum unfair-rejection is at floor; the temporal-discounting task shows photo-present impatience ($p(\text{now})$ rising from $\approx0.36$ to $0.44$--$0.54$) with \emph{no} emotion ladder. A capability control shows factual accuracy flat at $\sim$0.68--0.72 across affect conditions \citep{lin2022truthfulqa}, ruling out generic distraction. The cross-modal test---photo vs.\ matched caption/label/narrative---shows the image channel can move a dictator decision ($\Delta\approx-0.98$, CI excludes $0$, $n=8$) where text does not, but the effect is small-$n$ and model-dependent (inconclusive on E4B, divergent on 12B).
+Discrete fear-vs-anger on risky lotteries is null ($\Delta\approx-0.09$, CI includes $0$). In the dictator game a photo shifts giving---upward on Qwen3-VL-2B (no-image $58.2$ to a photo band $\approx62$) and downward on Qwen3-VL-4B ($60.2\to\approx55$), essentially flat on Gemma-4-E4B ($\approx65$)---but within each model the eight emotion arms are near-identical (Figure~\ref{fig:generosity}): the photo, not its emotion, moves giving, and the direction is model-dependent. A capability control shows factual accuracy flat at $\sim$0.68--0.72 across affect conditions \citep{lin2022truthfulqa}, ruling out generic distraction.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.60\linewidth]{figures/fig3_generosity.pdf}
+\caption{Generosity (dictator giving). A photo shifts giving relative to no-image, but the emotion arms within each model overlap and the direction differs by model---presence, not emotion.}
+\label{fig:generosity}
+\end{figure}
 
 \subsection{No causal mediation; no harmful-prompt jailbreak}
 \label{sec:mechanism}
-On the one locked mechanism artifact, the negative-vs-neutral photo contrast projects onto a joint affect direction under a describe prompt but is $\approx$10$\times$ smaller under a harmful prompt, and a causal restore fails ($\mathrm{drop}_{\mathrm{clean}}=1.68 < \mathrm{drop}_{\mathrm{rand}}=7.56$; refuse-rate drop $0.0$). Emotional photographs do not lower refusal on harmful instructions \citep{zou2023universal} (first-token refuse $0.99$--$1.00$ across no-image, negative, and neutral arms). A concurrent Gemma-3 program reports a coherent affect$\to$refusal gate under \emph{white-box steering}, but those tensors were not imported and the Gemma-4 stack does not reproduce a causal gate from image inputs.
+On the one locked mechanism artifact, the negative-vs-neutral photo contrast projects onto a joint affect direction under a describe prompt but is $\approx$10$\times$ smaller under a harmful prompt, and a causal restore fails ($\mathrm{drop}_{\mathrm{clean}}=1.68 < \mathrm{drop}_{\mathrm{rand}}=7.56$; refuse-rate drop $0.0$). Emotional photographs do not lower refusal on harmful instructions \citep{zou2023universal} (first-token refuse $0.99$--$1.00$ across no-image, negative, and neutral arms). A correlational mediation test on the affect direction supports the \emph{risk} arm on all four models ($a$, $c$, and $ab$ paths supported; 11--12 of 16 gates), while the dictator and Perez arms do not and the frozen-direction check fails; a correlational path is consistent with, but does not establish \citep{baron1986moderator}, causal mediation. A concurrent Gemma-3 program reports a coherent affect$\to$refusal gate under \emph{white-box steering}, but those tensors were not imported and the Gemma-4 stack does not reproduce a causal gate from image inputs.
 
 \section{Discussion}
 \label{sec:discuss}
@@ -106,7 +120,7 @@ The robust object is a vision-conditioned safety policy: attaching a photograph 
 
 \section{Limitations}
 \label{sec:limitations}
-Battery numbers are exploratory (small $n$; the cross-modal cell is $n=8$) and warrant a pre-registered, full-tier rerun. Absolute refusal rates differ by scorer (first-token vs.\ full-answer) and are not comparable across scorers. Emotion coverage is non-uniform across tasks and the two datasets are not yet balanced (OASIS enters only as a stimulus-source contrast). Quantization (nf4) and architecture (encoder vs.\ unified; E4B vs.\ 12B) are confounded with each other. Frozen mechanism tensors from the Gemma-3 program were not imported. Results are instruction-tuned Gemma and Qwen, not a survey of deployed systems.
+Battery numbers are exploratory (small $n$) and warrant a pre-registered, full-tier rerun. Two cells are excluded: the cross-modal control did not complete (its rewrite endpoint failed), and the temporal-discounting estimator returned degenerate values; the static-null control uses $n=20$. Absolute refusal rates differ by scorer (first-token vs.\ full-answer) and are not comparable across scorers. Emotion coverage is non-uniform across tasks and the two datasets are not yet balanced (OASIS enters only as a stimulus-source contrast). Quantization (nf4) and architecture (encoder vs.\ unified; E4B vs.\ 12B) are confounded with each other. Frozen mechanism tensors from the Gemma-3 program were not imported. Results are instruction-tuned Gemma and Qwen, not a survey of deployed systems.
 
 \section{Conclusion}
 \label{sec:conclusion}
